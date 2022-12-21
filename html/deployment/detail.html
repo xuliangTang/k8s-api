@@ -1,0 +1,108 @@
+
+<div class="outbox">
+    {{template "header" .}}
+    <div class="table-container is-centered" style="margin:0 auto">
+        <table class="table" >
+            <tbody>
+            <tr>
+                <td id="deployment" v="{{.Data.DepDetail.Name}}">名称：{{.Data.DepDetail.Name}}</td>
+                <td id="ns" v="{{.Data.DepDetail.NameSpace}}">命名空间：{{.Data.DepDetail.NameSpace}}</td>
+                <td>镜像：{{.Data.DepDetail.Images}}</td>
+                <td>创建时间：{{.Data.DepDetail.CreatedAt}}</td>
+            </tr>
+            <tr>
+                <td>副本：可用 {{index .Data.DepDetail.Replicas 1}} /不可用 {{index .Data.DepDetail.Replicas 2}}
+                    <button id="incr" class="button is-info is-small is-btn is-bold">+</button>
+                    <button id="dec" class="button is-info is-small is-btn is-bold">-</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav class="panel"  >
+            <p class="panel-heading">
+                Pods信息
+            </p>
+            <div class="table-container">
+                <table class="table"  >
+                    <thead>
+                    <th>状态</th>
+                    <th>名称</th>
+                    <th>镜像</th>
+                    <th>主机</th>
+                    <th>创建时间</th>
+                    </thead>
+                    <tbody id="podlist">
+                    <tr>
+                        <td>
+                            ${Phase}
+                            <p>${Message}</p>
+                        </td>
+                        <td>${Name}</td>
+                        <td>${Images}</td>
+                        <td>${NodeName} </td>
+                        <td>${CreatedAt} </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+{{template "footer" .}}
+<script>
+    function getObject(incr){
+        return {
+            "ns":$("#ns").attr("v"),
+            "deployment":$("#deployment").attr("v"),
+            "incr":incr
+        }
+    }
+    function incr(dec){
+        $.ajax({
+            type: "POST",
+            url: "/deployment/scale/update",
+            data: JSON.stringify(getObject(dec)),
+            dataType: "json",
+            success: function(data){
+                //alert("操作成功")
+                self.location.reload()
+            },
+            error:function (data) {
+                alert(data.responseJSON.error)
+            }
+        })
+    }
+    $("#incr").click(function () {
+        incr(true)
+    })
+    $("#dec").click(function () {
+        incr(false)
+    })
+
+    let tmpl=$("#podlist").html()
+    $("#podlist").html("");
+    $.template( "pods", tmpl);
+    const ns=$("#ns").attr("v")
+    const dep=$("#deployment").attr("v")
+    function loadPods() {
+        $.ajax({
+            type: "GET",
+            url: "/api/deployment/pods?namespace="+ns+"&deployment="+dep,
+            dataType: "json",
+            success: function (data) {
+                $("#podlist").html("");
+                $.tmpl("pods", data.data )
+                    .appendTo( "#podlist" );
+            },
+            error: function (data) {
+                alert(data.responseJSON.error)
+            }
+        })
+    }
+    loadPods()
+    window.setInterval("loadPods()",2000)
+
+</script>
