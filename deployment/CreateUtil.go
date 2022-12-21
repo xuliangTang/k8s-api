@@ -68,12 +68,14 @@ func CreateDeployment(req *DeploymentCreateReq) error {
 	return err
 }
 
+// 生成标签配置
 func genLabels(name string) map[string]string {
 	return map[string]string{
 		"app": name,
 	}
 }
 
+// 生成容器配置
 func genContainers(req *DeploymentCreateReq) []coreV1.Container {
 	containers := make([]coreV1.Container, 1)
 	containers[0] = coreV1.Container{

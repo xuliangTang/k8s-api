@@ -21,6 +21,8 @@ func RegHandlers(engine *gin.Engine) {
 	engine.Handle("DELETE", "/api/pod", DeletePodApi)
 	// 创建deployment
 	engine.Handle("POST", "/api/deployment", CreateDeploymentApi)
+	// 删除deployment
+	engine.Handle("DELETE", "/api/deployment", DeleteDeploymentApi)
 }
 
 func getDeployments(gc *gin.Context) {
@@ -102,4 +104,12 @@ func CreateDeploymentApi(gc *gin.Context) {
 	lib.CheckError(CreateDeployment(req))
 
 	gc.Redirect(301, "/deployments")
+}
+
+func DeleteDeploymentApi(gc *gin.Context) {
+	ns := gc.DefaultQuery("ns", "default")
+	deploymentName := gc.DefaultQuery("deployment", "default")
+
+	DeleteDeployment(ns, deploymentName)
+	lib.Success(gc, "success", nil)
 }

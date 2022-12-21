@@ -5,9 +5,23 @@
         <table class="table" >
             <thead>
             <tr>
-                <td colspan="100"><span>
-                    <input type="button" onclick="self.location='/create/deployment'" class="button" value="创建" />
-                </span></td>
+                <td colspan="100">
+                    <span><input type="button" onclick="self.location='/create/deployment'" class="button" value="创建" /></span>
+                    <span><input type="button" id="cmdDelDep" class="button" value="删除" /></span>
+                </td>
+                <script>
+                    $("#cmdDelDep").click(function(){
+                        $(".dep").each(function () {
+                            if($(this).prop("checked")){
+                                $.ajax({
+                                    type: "DELETE",
+                                    url: "/api/deployment?ns=" + $(this).attr("ns") + "&deployment=" + $(this).attr("dep"),
+                                    dataType: "json",
+                                })
+                            }
+                        })
+                    })
+                </script>
             </tr>
             </thead>
             <thead>
@@ -22,7 +36,7 @@
 
             <tbody id="dep">
             <tr>
-                <td><input type="checkbox"/></td>
+                <td><input  class="dep"  ns="${NameSpace}"  dep="${Name}"  type="checkbox" type="checkbox"/></td>
                 <td> - </td>
                 <td><a href="/deployment/${Name}">${Name}</a></td>
                 <td>${Images}</td>
@@ -35,6 +49,7 @@
     </div>
 
     <script>
+        let orgData=""
         let tmpl=$("#dep").html()
         $("#dep").html("");
         $.template( "deployments", tmpl );
@@ -44,9 +59,13 @@
                 url: "/api/deployments",
                 dataType: "json",
                 success: function (data) {
-                    $("#dep").html("");
-                    $.tmpl("deployments", data.data )
-                        .appendTo( "#dep" );
+                    let tmpMd5=md5(JSON.stringify(data.data))
+                    if(tmpMd5!==orgData) {
+                        $("#dep").html("");
+                        orgData=tmpMd5
+                        $.tmpl("deployments", data.data)
+                            .appendTo("#dep");
+                    }
                 },
                 error: function (data) {
                     alert(data.responseJSON.error)

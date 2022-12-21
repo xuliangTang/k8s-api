@@ -13,9 +13,10 @@ func ListAll(namespace string) (ret []*model.DeploymentModel) {
 
 	for _, item := range depList { //遍历所有deployment
 		ret = append(ret, &model.DeploymentModel{
-			Name:     item.Name,
-			Replicas: [3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas},
-			Images:   GetDepImages(*item),
+			Name:      item.Name,
+			NameSpace: item.Namespace,
+			Replicas:  [3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas},
+			Images:    GetDepImages(*item),
 		})
 	}
 
