@@ -12,6 +12,7 @@ func RegHandlers(engine *gin.Engine) {
 	engine.Handle("POST", "/deployment/scale/update", incrReplicas)
 	engine.Handle("GET", "/api/deployments", getDeployments)
 	engine.Handle("GET", "/api/deployment/pods", GetPodsByDeployment)
+	engine.Handle("GET", "/api/pod", FindPod)
 }
 
 func getDeployments(gc *gin.Context) {
@@ -68,4 +69,13 @@ func GetPodsByDeployment(gc *gin.Context) {
 
 	// 根据labels获取pod
 	lib.Success(gc, "success", GetPodsByLabels(ns, labels))
+}
+
+func FindPod(gc *gin.Context) {
+	ns := gc.DefaultQuery("ns", "default")
+	podName := gc.DefaultQuery("pod", "default")
+
+	pod := core.PodMapImpl.Find(ns, podName)
+
+	gc.JSON(200, pod)
 }

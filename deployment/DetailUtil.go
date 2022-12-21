@@ -30,12 +30,13 @@ func GetPodsByLabels(ns string, labels []map[string]string) (pods []*model.PodMo
 
 	for i, pod := range podList {
 		pods[i] = &model.PodModel{
-			Name:     pod.Name,
-			NodeName: pod.Spec.NodeName,
-			Images:   GetPodImages(pod.Spec.Containers),
-			Phase:    string(pod.Status.Phase),
-			IsReady:  GetPodIsReady(pod),
-			// Message:   GetPodMessage(pod),
+			Name:      pod.Name,
+			NameSpace: pod.Namespace,
+			NodeName:  pod.Spec.NodeName,
+			Images:    GetPodImages(pod.Spec.Containers),
+			Ip:        [2]string{pod.Status.PodIP, pod.Status.HostIP},
+			Phase:     string(pod.Status.Phase),
+			IsReady:   GetPodIsReady(pod),
 			Message:   core.EventMapImpl.GetMessage(pod.Namespace, "Pod", pod.Name),
 			CreatedAt: pod.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		}
@@ -73,6 +74,9 @@ func DepDetail(namespace string, name string) (ret model.DeploymentModel) {
 	getOpt := metav1.GetOptions{}
 	dep, err := lib.K8sClient.AppsV1().Deployments(namespace).Get(ctx, name, getOpt)
 	lib.CheckError(err)
+
+	//dep, err := core.DepMapImpl.Find(namespace, name)
+	//lib.CheckError(err)
 
 	ret.Name = dep.Name
 	ret.Images = GetDepImages(*dep)

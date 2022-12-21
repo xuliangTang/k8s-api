@@ -1,6 +1,5 @@
 @charset "utf-8";
 
-
 html {
     color: #333;
     background: #fafafa !important;
@@ -8,9 +7,6 @@ html {
     -ms-text-size-adjust: 100%;
     text-rendering: optimizelegibility;
 }
-
-
-
 
 html.borderbox *, html.borderbox *:before, html.borderbox *:after {
     -moz-box-sizing: border-box;
@@ -25,3 +21,6 @@ body, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset,
 }
 .outbox{margin:0 auto;text-align: center;width:100%}
 .table{margin: 0 auto}
+
+.is-red{color: red}
+.is-gray{color: gray}

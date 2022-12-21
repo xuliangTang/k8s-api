@@ -79,6 +79,18 @@ func (this *PodMap) ListByLabels(ns string, labels []map[string]string) ([]*v1.P
 	return nil, fmt.Errorf("pods not found")
 }
 
+// Find 查找 Pod
+func (this *PodMap) Find(ns string, name string) *v1.Pod {
+	if podList, ok := this.Data.Load(ns); ok {
+		for _, p := range podList.([]*v1.Pod) {
+			if p.Name == name {
+				return p
+			}
+		}
+	}
+	return nil
+}
+
 // PodHandler informer实现
 type PodHandler struct{}
 

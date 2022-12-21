@@ -32,18 +32,26 @@
                     <th>镜像</th>
                     <th>主机</th>
                     <th>创建时间</th>
+                    <th></th>
                     </thead>
                     <tbody id="podlist">
                     <tr>
                         <td>
                             ${Phase}
-                            <p>${Message}</p>
+                            <p class="is-red">${Message}</p>
                         </td>
                         <td>${Status}</td>
-                        <td>${Name}</td>
+                        <td>
+                            ${Name}
+                            <p class="is-gray">${Ip[0]}</p>
+                        </td>
                         <td>${Images}</td>
-                        <td>${NodeName} </td>
+                        <td>
+                            ${NodeName}
+                            <p class="is-gray">${Ip[1]}</p>
+                        </td>
                         <td>${CreatedAt} </td>
+                        <td><a href="/api/pod?pod=${Name}&ns=${NameSpace}" target="_blank">查看JSON</a></td>
                     </tr>
                     </tbody>
                 </table>
