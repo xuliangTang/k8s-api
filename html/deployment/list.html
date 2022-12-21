@@ -37,7 +37,10 @@
             <tbody id="dep">
             <tr>
                 <td><input  class="dep"  ns="${NameSpace}"  dep="${Name}"  type="checkbox" type="checkbox"/></td>
-                <td> - </td>
+                <td>
+                    ${Status}
+                    <p class="is-red">${Message}</p>
+                </td>
                 <td><a href="/deployment/${Name}">${Name}</a></td>
                 <td>${Images}</td>
                 <td class="is-border"> <span  >${Replicas[0]}</span>
@@ -63,6 +66,16 @@
                     if(tmpMd5!==orgData) {
                         $("#dep").html("");
                         orgData=tmpMd5
+
+                        let deployments=data.data;    // deployment列表
+                        deployments.forEach((dep)=>{
+                            if(dep.IsCompleted){
+                                dep.Status="Active"
+                                dep.Message=""
+                            } else {
+                                dep.Status = "Waiting"
+                            }
+                        })
                         $.tmpl("deployments", data.data)
                             .appendTo("#dep");
                     }

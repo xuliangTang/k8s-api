@@ -10,10 +10,12 @@ import (
 	"strings"
 )
 
+// GetDepImages 获取deployment的镜像文本
 func GetDepImages(deployment v1.Deployment) string {
 	return GetPodImages(deployment.Spec.Template.Spec.Containers)
 }
 
+// GetPodImages 获取pod镜像文本
 func GetPodImages(cs []coreV1.Container) string {
 	var images strings.Builder
 	images.WriteString(cs[0].Image)
@@ -24,6 +26,7 @@ func GetPodImages(cs []coreV1.Container) string {
 	return images.String()
 }
 
+// GetLabels 标签转化为字符串 (官方提供了 metaV1.LabelSelectorAsSelector 方法)
 func GetLabels(labels map[string]string) string {
 	var labelStr strings.Builder
 
@@ -118,4 +121,20 @@ func GetPodIsReady(pod *coreV1.Pod) bool {
 	}
 
 	return true
+}
+
+// GetDeploymentIsCompleted 评估deployment是否就绪
+func GetDeploymentIsCompleted(deployment *v1.Deployment) bool {
+	return deployment.Status.Replicas == deployment.Status.AvailableReplicas
+}
+
+// GetDeploymentConditionsMessage 从Status.Conditions中获取deployment失败信息
+func GetDeploymentConditionsMessage(deployment *v1.Deployment) string {
+	for _, condition := range deployment.Status.Conditions {
+		if condition.Type == "Available" && condition.Status != "True" {
+			return condition.Message
+		}
+	}
+
+	return ""
 }
