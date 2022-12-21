@@ -7,6 +7,7 @@ import (
 	"k8sapi/core"
 	"k8sapi/deployment"
 	"k8sapi/lib"
+	"log"
 	"net/http"
 )
 
@@ -28,6 +29,7 @@ func main() {
 	r.Use(func(context *gin.Context) {
 		defer func() {
 			if e := recover(); e != nil {
+				log.Println(e)
 				context.AbortWithStatusJSON(500, gin.H{"message": e})
 			}
 		}()
@@ -48,6 +50,12 @@ func main() {
 			lib.DataBuilder().
 				SetTitle(c.Param("name")+"详情").
 				SetData("DepDetail", deployment.DepDetail("default", c.Param("name"))))
+	})
+
+	r.GET("/create/deployment", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "deployment_create.html",
+			lib.DataBuilder().
+				SetTitle("deployment创建"))
 	})
 
 	core.InitDeployments()

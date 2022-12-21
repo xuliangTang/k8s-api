@@ -70,13 +70,13 @@ func GetPodsByDep(namespace string, dep *v1.Deployment) (pods []*model.PodModel)
 }
 
 func DepDetail(namespace string, name string) (ret model.DeploymentModel) {
-	ctx := context.Background()
-	getOpt := metav1.GetOptions{}
-	dep, err := lib.K8sClient.AppsV1().Deployments(namespace).Get(ctx, name, getOpt)
-	lib.CheckError(err)
-
-	//dep, err := core.DepMapImpl.Find(namespace, name)
+	//ctx := context.Background()
+	//getOpt := metav1.GetOptions{}
+	//dep, err := lib.K8sClient.AppsV1().Deployments(namespace).Get(ctx, name, getOpt)
 	//lib.CheckError(err)
+
+	dep, err := core.DepMapImpl.Find(namespace, name)
+	lib.CheckError(err)
 
 	ret.Name = dep.Name
 	ret.Images = GetDepImages(*dep)

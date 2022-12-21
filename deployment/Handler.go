@@ -9,11 +9,18 @@ import (
 )
 
 func RegHandlers(engine *gin.Engine) {
+	// 修改副本数
 	engine.Handle("POST", "/deployment/scale/update", incrReplicas)
+	// 获取deployment列表
 	engine.Handle("GET", "/api/deployments", getDeployments)
+	// 获取deployment的pod列表
 	engine.Handle("GET", "/api/deployment/pods", GetPodsByDeployment)
+	// 获取pod json
 	engine.Handle("GET", "/api/pod", FindPod)
+	// 删除pod
 	engine.Handle("DELETE", "/api/pod", DeletePodApi)
+	// 创建deployment
+	engine.Handle("POST", "/api/deployment", CreateDeploymentApi)
 }
 
 func getDeployments(gc *gin.Context) {
@@ -87,4 +94,12 @@ func DeletePodApi(gc *gin.Context) {
 
 	DeletePod(ns, podName)
 	lib.Success(gc, "success", nil)
+}
+
+func CreateDeploymentApi(gc *gin.Context) {
+	req := &DeploymentCreateReq{}
+	lib.CheckError(gc.ShouldBind(req))
+	lib.CheckError(CreateDeployment(req))
+
+	gc.Redirect(301, "/deployments")
 }
