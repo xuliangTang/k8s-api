@@ -60,14 +60,16 @@ func (this *PodMap) Delete(pod *v1.Pod) {
 }
 
 // ListByLabels 根据标签获取Pod列表
-func (this *PodMap) ListByLabels(ns string, labels map[string]string) ([]*v1.Pod, error) {
+func (this *PodMap) ListByLabels(ns string, labels []map[string]string) ([]*v1.Pod, error) {
 	ret := make([]*v1.Pod, 0)
 	if podList, ok := this.Data.Load(ns); ok {
 		podList := podList.([]*v1.Pod)
 		for _, p := range podList {
-			// 判断标签完全匹配
-			if reflect.DeepEqual(p.Labels, labels) {
-				ret = append(ret, p)
+			for _, label := range labels {
+				// 判断标签完全匹配
+				if reflect.DeepEqual(p.Labels, label) {
+					ret = append(ret, p)
+				}
 			}
 		}
 

@@ -38,18 +38,19 @@ func GetLabels(labels map[string]string) string {
 }
 
 // GetListWatchRsLabelByDeployment list-watch方式 根据deployment获取当前ReplicaSet的标签
-func GetListWatchRsLabelByDeployment(deployment *v1.Deployment, rsList []*v1.ReplicaSet) (map[string]string, error) {
+func GetListWatchRsLabelByDeployment(deployment *v1.Deployment, rsList []*v1.ReplicaSet) ([]map[string]string, error) {
+	labels := make([]map[string]string, 0)
 	for _, rs := range rsList {
-		if IsCurrentRsByDeployment(rs, deployment) {
+		if IsRsByDeployment(rs, deployment) {
 			selector, err := metaV1.LabelSelectorAsMap(rs.Spec.Selector)
 			if err != nil {
 				return nil, err
 			}
-			return selector, nil
+			labels = append(labels, selector)
 		}
 	}
 
-	return nil, nil
+	return labels, nil
 }
 
 // GetRsLabelByDeployment 根据deployment获取当前ReplicaSet的标签
@@ -78,12 +79,8 @@ func GetRsLabelByDeployment(deployment *v1.Deployment) string {
 	return ""
 }
 
-// IsCurrentRsByDeployment 判断rs是否对应当前deployment
-func IsCurrentRsByDeployment(set *v1.ReplicaSet, deployment *v1.Deployment) bool {
-	if set.ObjectMeta.Annotations["deployment.kubernetes.io/revision"] != deployment.ObjectMeta.Annotations["deployment.kubernetes.io/revision"] {
-		return false
-	}
-
+// IsRsByDeployment 判断rs是否属于当前deployment
+func IsRsByDeployment(set *v1.ReplicaSet, deployment *v1.Deployment) bool {
 	for _, rf := range set.OwnerReferences {
 		if rf.Kind == "Deployment" && rf.Name == deployment.Name {
 			return true
@@ -93,7 +90,16 @@ func IsCurrentRsByDeployment(set *v1.ReplicaSet, deployment *v1.Deployment) bool
 	return false
 }
 
-// GetPodIsReady 判断容器状态
+// IsCurrentRsByDeployment 判断rs是否属于当前deployment最新的一条
+func IsCurrentRsByDeployment(set *v1.ReplicaSet, deployment *v1.Deployment) bool {
+	if set.ObjectMeta.Annotations["deployment.kubernetes.io/revision"] != deployment.ObjectMeta.Annotations["deployment.kubernetes.io/revision"] {
+		return false
+	}
+
+	return IsRsByDeployment(set, deployment)
+}
+
+// GetPodIsReady 评估Pod是否就绪
 func GetPodIsReady(pod *coreV1.Pod) bool {
 	// 所有容器是否就绪
 	for _, condition := range pod.Status.Conditions {

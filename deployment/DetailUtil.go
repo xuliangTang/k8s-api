@@ -22,7 +22,7 @@ func GetPodMessage(pod *corev1.Pod) string {
 }
 
 // GetPodsByLabels 获取pods DTO 把原生的 pod 对象转换为自己的实体对象
-func GetPodsByLabels(ns string, labels map[string]string) (pods []*model.PodModel) {
+func GetPodsByLabels(ns string, labels []map[string]string) (pods []*model.PodModel) {
 	podList, err := core.PodMapImpl.ListByLabels(ns, labels)
 	lib.CheckError(err)
 
