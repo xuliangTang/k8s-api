@@ -19,13 +19,32 @@
             </tbody>
         </table>
 
-        <nav class="panel"  >
+        <nav class="panel">
             <p class="panel-heading">
                 Pods信息
             </p>
             <div class="table-container">
-                <table class="table"  >
+                <p class="is-left text-left">
+                    <button id="cmdDelPod" class="button">删除POD</button>
+                </p>
+
+                <script>
+                    $("#cmdDelPod").click(function(){
+                        $(".pods").each(function () {
+                            if($(this).prop("checked")){
+                                $.ajax({
+                                    type: "DELETE",
+                                    url: "/api/pod?ns=" + $(this).attr("ns") + "&pod=" + $(this).attr("pod"),
+                                    dataType: "json",
+                                })
+                            }
+                        })
+                    })
+                </script>
+
+                <table class="table" style="width: 100%">
                     <thead>
+                    <th></th>
                     <th>阶段</th>
                     <th>状态</th>
                     <th>名称</th>
@@ -36,6 +55,7 @@
                     </thead>
                     <tbody id="podlist">
                     <tr>
+                        <td><input class="pods"  ns="${NameSpace}"  pod="${Name}" type="checkbox"/></td>
                         <td>
                             ${Phase}
                             <p class="is-red">${Message}</p>
