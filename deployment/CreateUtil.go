@@ -38,8 +38,9 @@ func Create() {
 }
 
 type DeploymentCreateReq struct {
-	Name  string `form:"name" binding:"required"`
-	Image string `form:"image" binding:"required"`
+	Name  string  `form:"name" binding:"required"`
+	Image string  `form:"image" binding:"required"`
+	Ports []int32 `form:"port"`
 }
 
 func CreateDeployment(req *DeploymentCreateReq) error {
@@ -77,10 +78,20 @@ func genLabels(name string) map[string]string {
 
 // 生成容器配置
 func genContainers(req *DeploymentCreateReq) []coreV1.Container {
+	containerPorts := make([]coreV1.ContainerPort, len(req.Ports))
+	for i, _ := range containerPorts {
+		containerPorts[i] = coreV1.ContainerPort{
+			Name:          fmt.Sprintf("%s%d", req.Name, req.Ports[i]),
+			Protocol:      coreV1.ProtocolTCP,
+			ContainerPort: req.Ports[i],
+		}
+	}
+
 	containers := make([]coreV1.Container, 1)
 	containers[0] = coreV1.Container{
 		Name:  req.Name,
 		Image: req.Image,
+		Ports: containerPorts,
 	}
 	return containers
 }

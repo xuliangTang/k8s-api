@@ -7,7 +7,6 @@
         </p>
     <div class="table-container is-centered" style="margin:0 auto">
         <table class="table"  style="width: 500px">
-
             <tbody id="dep">
                 <tr>
                     <td>名称</td>
@@ -19,6 +18,32 @@
                 </tr>
             </tbody>
         </table>
+
+        <p class="panel-heading">
+            端口映射 <input type="button" value="+" id="cmdAddPort"/>
+            <input type="button" value="-" id="cmdRmPort"/>
+        </p>
+        <table class="table"  style="width: 500px">
+            <tbody id="portBody">
+            <tr>
+                <td>端口</td>
+                <td><input name="port" type="text" class="input"/></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <script>
+            $("#cmdAddPort").click(function () {
+                let c=$("#portBody").children("tr:first").clone()
+                c.find("input:first").val('')
+                c.appendTo('#portBody')
+            })
+            $("#cmdRmPort").click(function () {
+                if($("#portBody").children("tr").length>1){
+                    $("#portBody").children("tr:last").remove()
+                }
+            })
+        </script>
     </div>
     </nav>
 
