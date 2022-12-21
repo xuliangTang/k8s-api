@@ -111,5 +111,8 @@ func InitDeployments() {
 	replicaSetInformer := informerFactory.Apps().V1().ReplicaSets()
 	replicaSetInformer.Informer().AddEventHandler(&ReplicaSetHandler{})
 
+	eventInformer := informerFactory.Core().V1().Events()
+	eventInformer.Informer().AddEventHandler(&EventHandler{})
+	
 	informerFactory.Start(wait.NeverStop)
 }

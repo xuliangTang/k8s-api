@@ -92,3 +92,24 @@ func IsCurrentRsByDeployment(set *v1.ReplicaSet, deployment *v1.Deployment) bool
 
 	return false
 }
+
+// GetPodIsReady 判断容器状态
+func GetPodIsReady(pod *coreV1.Pod) bool {
+	// 所有容器是否就绪
+	for _, condition := range pod.Status.Conditions {
+		if condition.Type == "ContainersReady" && condition.Status != "True" {
+			return false
+		}
+	}
+
+	// readinessGates
+	for _, rg := range pod.Spec.ReadinessGates {
+		for _, condition := range pod.Status.Conditions {
+			if condition.Type == rg.ConditionType && condition.Status != "True" {
+				return false
+			}
+		}
+	}
+
+	return true
+}

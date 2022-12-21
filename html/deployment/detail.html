@@ -26,6 +26,7 @@
             <div class="table-container">
                 <table class="table"  >
                     <thead>
+                    <th>阶段</th>
                     <th>状态</th>
                     <th>名称</th>
                     <th>镜像</th>
@@ -38,6 +39,7 @@
                             ${Phase}
                             <p>${Message}</p>
                         </td>
+                        <td>${Status}</td>
                         <td>${Name}</td>
                         <td>${Images}</td>
                         <td>${NodeName} </td>
@@ -82,9 +84,10 @@
         incr(false)
     })
 
+    let orgData=""
     let tmpl=$("#podlist").html()
     $("#podlist").html("");
-    $.template( "pods", tmpl);
+    $.template("pods", tmpl);
     const ns=$("#ns").attr("v")
     const dep=$("#deployment").attr("v")
     function loadPods() {
@@ -93,9 +96,22 @@
             url: "/api/deployment/pods?namespace="+ns+"&deployment="+dep,
             dataType: "json",
             success: function (data) {
-                $("#podlist").html("");
-                $.tmpl("pods", data.data )
-                    .appendTo( "#podlist" );
+                let tmpMd5=md5(JSON.stringify(data.data))
+                if(tmpMd5!==orgData){
+                    $("#podlist").html("");
+                    let pods=data.data;    // pods列表
+                    pods.forEach((pod)=>{
+                        if(pod.IsReady){
+                            pod.Status="Active"
+                            pod.Message=""
+                        }
+                        else
+                            pod.Status="Waiting"
+                    })
+                    $.tmpl("pods", pods)
+                        .appendTo("#podlist");
+                    orgData=tmpMd5
+                }
             },
             error: function (data) {
                 alert(data.responseJSON.error)

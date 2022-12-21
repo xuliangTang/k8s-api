@@ -30,11 +30,13 @@ func GetPodsByLabels(ns string, labels map[string]string) (pods []*model.PodMode
 
 	for i, pod := range podList {
 		pods[i] = &model.PodModel{
-			Name:      pod.Name,
-			NodeName:  pod.Spec.NodeName,
-			Images:    GetPodImages(pod.Spec.Containers),
-			Phase:     string(pod.Status.Phase),
-			Message:   GetPodMessage(pod),
+			Name:     pod.Name,
+			NodeName: pod.Spec.NodeName,
+			Images:   GetPodImages(pod.Spec.Containers),
+			Phase:    string(pod.Status.Phase),
+			IsReady:  GetPodIsReady(pod),
+			// Message:   GetPodMessage(pod),
+			Message:   core.EventMapImpl.GetMessage(pod.Namespace, "Pod", pod.Name),
 			CreatedAt: pod.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		}
 	}
